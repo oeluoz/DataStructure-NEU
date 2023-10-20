@@ -32,10 +32,12 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
-		<Unit filename="LinkList.cpp">
-			<Option target="&lt;{~None~}&gt;" />
-		</Unit>
+		<Unit filename="CircularLinkList.cpp" />
+		<Unit filename="CircularLinkList.h" />
+		<Unit filename="LinkList.cpp" />
 		<Unit filename="LinkList.h" />
+		<Unit filename="Tree.cpp" />
+		<Unit filename="Tree.h" />
 		<Unit filename="main.cpp" />
 		<Extensions>
 			<lib_finder disable_auto="1" />
