@@ -542,5 +542,3 @@ void splitBST(int key, BSTree &T, BSTree &T1, BSTree &T2)
         }
     }
 }
-
-
