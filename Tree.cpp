@@ -5,6 +5,8 @@
 #include <queue>
 using std::queue;
 
+#include "Ds-Tree.h"
+
 #define MAXNODE 100 // 树节点最多数
 
 BiTreeNode* globalPre;
@@ -50,7 +52,9 @@ void treeDemo()
     xHeight = getXnodeHeight(root, 'M');
     printf("xHeihgt: %d\n", xHeight);
     //exchangeTree(root);
-    preTraverse(root);
+    
+    //printf("%c ", rootLevel->data);
+    preTraverse(rootLevel);
     printf("\n");
 
     /*
@@ -89,6 +93,7 @@ void treeDemo()
     int dataBST[] = {6, 8, 2, 1, 4, 3};
     bstCreate(bstRoot, dataBST, 6);
     // bstDelete(bstRoot, 2);
+    /*
     inTraverse(bstRoot);
     printf("\nx depth: %d \n", getXlevel(bstRoot, 3, 1));
     BSTree T1 = NULL, T2 = NULL;
@@ -96,6 +101,18 @@ void treeDemo()
     inTraverse(T1);
     printf("\n");
     inTraverse(T2);
+    */
+    printf("@getReverseLayer: ");
+    getReverseLayer(rootLevel);
+    printf("\n");
+    printf("@getHeightNoneRe: ");
+    printf("%d \n", getHeightNoneRe(rootLevel));
+    printf("@gktDoubleDegree: %d", getDoubleDegree(rootLevel));
+    int current = 1;
+    printf("\n@preTraverse K: %c \n", preTraverseK(rootLevel, current, 3));
+    kthNode(rootLevel, 2);
+    getXParant(rootLevel, 'G');
+    printf("\n");
 }
 
 void preTraverse(BiTree root)
@@ -183,6 +200,7 @@ BiTree createTreeLevelAndIn(ElemType levelOrderList[], int levelStartIndex, int 
                                         inOrderList, inStartIndex, rIndex - 1);
     root->rchild = createTreeLevelAndIn(rightLevelOrderList, 0, rightLevelOrderLength - 1,
                                         inOrderList, rIndex + 1, inEndIndex);
+    return root;
 }
 
 int getTreeNode(BiTree root)
@@ -377,7 +395,7 @@ int isCompleteTree(BiTree root)
     while(!treeQueue.empty()) {
         BiTreeNode* t = treeQueue.front();
         treeQueue.pop();
-        if(!t) break;
+        if(!t) break; // 出现了NULL，所有节点都已经加入完了
         treeQueue.push(t->lchild);
         treeQueue.push(t->rchild);
     }
