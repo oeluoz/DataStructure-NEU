@@ -9,6 +9,7 @@ using std::queue;
 
 BiTreeNode* globalPre;
 BiTreeNode* globalHead;
+BSTNode *pCloseValue = NULL;
 
 void treeDemo()
 {
@@ -91,11 +92,23 @@ void treeDemo()
     // bstDelete(bstRoot, 2);
     inTraverse(bstRoot);
     printf("\nx depth: %d \n", getXlevel(bstRoot, 3, 1));
+
+    /*
     BSTree T1 = NULL, T2 = NULL;
     splitBST(3, bstRoot, T1, T2);
     inTraverse(T1);
     printf("\n");
     inTraverse(T2);
+    */
+    // removeLowerThanK(bstRoot, 5);
+    // printf("delete K: ");
+    // inTraverse(bstRoot);
+    findAllLowerThanK(bstRoot, 5);
+    int preValue = -1;
+    getBiggerThanValue(bstRoot, 7, preValue);
+    printf("\nbigger than value: reference: %d global: ", preValue);
+    getBiggerThanValueGlobal(bstRoot, 7);
+    printf("%d \n", pCloseValue->data);
 }
 
 void preTraverse(BiTree root)
@@ -503,7 +516,17 @@ int getXlevel(BSTree T, int x, int depth)
 }
 
 // 查找二叉树中所有小于key的关键字
+void findAllLowerThanK(BSTree T, int k)
+{
+    if(T) {
+        findAllLowerThanK(T->lchild, k);
+        if(T->data < k) {
+            printf("%d ", T->data);
+            findAllLowerThanK(T->rchild, k);
+        }
+    }
 
+}
 // 计算查找成功的ASL(不会将NULL节点计算进比较节点)
 
 // BST插入，只用插入根节点
@@ -542,5 +565,65 @@ void splitBST(int key, BSTree &T, BSTree &T1, BSTree &T2)
         }
     }
 }
+// 释放树的的空间
+void freeTree(BSTree&T) {
+    if(T) {
+        freeTree(T->lchild);
+        freeTree(T->rchild);
+        free(T);
+        T = NULL;
+    }
+}
 
+// 删除二叉排序树中所有节点值小于x的节点(先序遍历)
+void removeLowerThanK(BSTree &T, int k)
+{
+    if(T) {
+        if(T->data == k) { // 删除左子树
+            freeTree(T->lchild);
+        }else if(T->data < k) {
+            BSTNode* t = T;
+            t->rchild = NULL; // 必须要将待删除右子树置空，不然会把保留的子树删除
+            freeTree(t);
+
+            T = T->rchild;
+            removeLowerThanK(T, k);
+        } else {
+            removeLowerThanK(T->lchild, k);
+        }
+    }
+}
+
+// 查找 value，找到返回比value大的最小值，value已经是最大返回空
+// 用一个 pre 指向中序遍历的前一个节点，前一个节点
+// 前一个节点 = value 当前节点 > value || 前一个节点 < value 当前节点 > value
+void getBiggerThanValue(BSTree T, int value, int &preValue)
+{
+    if(T) {
+        getBiggerThanValue(T->lchild, value, preValue);
+        if(preValue<= value && T->data <= value) {
+            preValue = T->data;
+            getBiggerThanValue(T->rchild, value, preValue);
+        } else if(preValue <= value){
+            preValue = T->data;
+        }
+    }
+}
+
+// 从左子树开始遍历 前一个元素 > value && 当前元素 <= value
+// 上一个元素就是 > value 的最小值，否则继续遍历左子树，找
+// 更小的数据
+
+
+void getBiggerThanValueGlobal(BSTree T, int value) {
+    if(T) {
+        getBiggerThanValueGlobal(T->rchild, value);
+        if(T->data > value) {
+            pCloseValue = T;
+            getBiggerThanValueGlobal(T->lchild, value);
+        }
+    }
+}
+
+// 平衡二叉树
 

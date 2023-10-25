@@ -44,4 +44,10 @@ int bstDelete(BSTree &T, int data);
 int getXlevel(BSTree T, int x, int depth);
 void insertSubTree(BSTree &root, BSTree sub);
 void splitBST(int key, BSTree &T, BSTree &T1, BSTree &T2);
+void freeTree(BSTree&T);
+void removeLowerThanK(BSTree &T, int k);
+void findAllLowerThanK(BSTree T, int k);
+void getBiggerThanValue(BSTree T, int value, int &preValue);
+
+void getBiggerThanValueGlobal(BSTree T, int value);
 #endif // TREE_H_INCLUDED
