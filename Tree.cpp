@@ -5,6 +5,8 @@
 #include <queue>
 using std::queue;
 
+#include "Ds-Tree.h"
+
 #define MAXNODE 100 // 树节点最多数
 
 BiTreeNode* globalPre;
@@ -51,7 +53,9 @@ void treeDemo()
     xHeight = getXnodeHeight(root, 'M');
     printf("xHeihgt: %d\n", xHeight);
     //exchangeTree(root);
-    preTraverse(root);
+    
+    //printf("%c ", rootLevel->data);
+    preTraverse(rootLevel);
     printf("\n");
 
     /*
@@ -90,6 +94,7 @@ void treeDemo()
     int dataBST[] = {6, 8, 2, 1, 4, 3};
     bstCreate(bstRoot, dataBST, 6);
     // bstDelete(bstRoot, 2);
+    /*
     inTraverse(bstRoot);
     printf("\nx depth: %d \n", getXlevel(bstRoot, 3, 1));
 
@@ -99,6 +104,18 @@ void treeDemo()
     inTraverse(T1);
     printf("\n");
     inTraverse(T2);
+    */
+    printf("@getReverseLayer: ");
+    getReverseLayer(rootLevel);
+    printf("\n");
+    printf("@getHeightNoneRe: ");
+    printf("%d \n", getHeightNoneRe(rootLevel));
+    printf("@gktDoubleDegree: %d", getDoubleDegree(rootLevel));
+    int current = 1;
+    printf("\n@preTraverse K: %c \n", preTraverseK(rootLevel, current, 3));
+    kthNode(rootLevel, 2);
+    getXParant(rootLevel, 'G');
+    printf("\n");
     */
     // removeLowerThanK(bstRoot, 5);
     // printf("delete K: ");
@@ -196,6 +213,7 @@ BiTree createTreeLevelAndIn(ElemType levelOrderList[], int levelStartIndex, int 
                                         inOrderList, inStartIndex, rIndex - 1);
     root->rchild = createTreeLevelAndIn(rightLevelOrderList, 0, rightLevelOrderLength - 1,
                                         inOrderList, rIndex + 1, inEndIndex);
+    return root;
 }
 
 int getTreeNode(BiTree root)
@@ -390,7 +408,7 @@ int isCompleteTree(BiTree root)
     while(!treeQueue.empty()) {
         BiTreeNode* t = treeQueue.front();
         treeQueue.pop();
-        if(!t) break;
+        if(!t) break; // 出现了NULL，所有节点都已经加入完了
         treeQueue.push(t->lchild);
         treeQueue.push(t->rchild);
     }
@@ -565,65 +583,5 @@ void splitBST(int key, BSTree &T, BSTree &T1, BSTree &T2)
         }
     }
 }
-// 释放树的的空间
-void freeTree(BSTree&T) {
-    if(T) {
-        freeTree(T->lchild);
-        freeTree(T->rchild);
-        free(T);
-        T = NULL;
-    }
-}
 
-// 删除二叉排序树中所有节点值小于x的节点(先序遍历)
-void removeLowerThanK(BSTree &T, int k)
-{
-    if(T) {
-        if(T->data == k) { // 删除左子树
-            freeTree(T->lchild);
-        }else if(T->data < k) {
-            BSTNode* t = T;
-            t->rchild = NULL; // 必须要将待删除右子树置空，不然会把保留的子树删除
-            freeTree(t);
-
-            T = T->rchild;
-            removeLowerThanK(T, k);
-        } else {
-            removeLowerThanK(T->lchild, k);
-        }
-    }
-}
-
-// 查找 value，找到返回比value大的最小值，value已经是最大返回空
-// 用一个 pre 指向中序遍历的前一个节点，前一个节点
-// 前一个节点 = value 当前节点 > value || 前一个节点 < value 当前节点 > value
-void getBiggerThanValue(BSTree T, int value, int &preValue)
-{
-    if(T) {
-        getBiggerThanValue(T->lchild, value, preValue);
-        if(preValue<= value && T->data <= value) {
-            preValue = T->data;
-            getBiggerThanValue(T->rchild, value, preValue);
-        } else if(preValue <= value){
-            preValue = T->data;
-        }
-    }
-}
-
-// 从左子树开始遍历 前一个元素 > value && 当前元素 <= value
-// 上一个元素就是 > value 的最小值，否则继续遍历左子树，找
-// 更小的数据
-
-
-void getBiggerThanValueGlobal(BSTree T, int value) {
-    if(T) {
-        getBiggerThanValueGlobal(T->rchild, value);
-        if(T->data > value) {
-            pCloseValue = T;
-            getBiggerThanValueGlobal(T->lchild, value);
-        }
-    }
-}
-
-// 平衡二叉树
 
