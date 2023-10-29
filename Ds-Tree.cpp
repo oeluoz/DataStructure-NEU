@@ -3,9 +3,11 @@
 #include "Tree.h"
 #include <stack>
 #include <queue>
+#include <vector>
 
 using std::stack;
 using std::queue;
+using std::vector;
 
 int getLeastSameParent(int T[], int i, int j) {
     while (i!=j) {
@@ -208,4 +210,58 @@ int getXParant(BiTree T, char x) {
         }
     }
     return 0;
+}
+#define MAX_SIZE 100
+// 寻找两个节点最近公共节点
+BiTreeNode *getAncestor(BiTreeNode *T, BiTreeNode* p, BiTreeNode *q) {
+    // 后续遍历找到节点，将所有的根节点保存下来
+    BiTreeNode *pTop = T;
+    BiTreeNode *r = NULL;
+    stack<BiTreeNode*> stk;
+    int pSize = 0, qSize = 0;
+    BiTreeNode *pRoot[MAX_SIZE], *qRoot[MAX_SIZE];
+    while(pTop || stk.empty()) {
+        if(pTop) {
+            stk.push(pTop);
+            pTop = pTop->lchild;
+        } else {
+            pTop = stk.top();
+            if(pTop->rchild && pTop->rchild != r) {
+                pTop = pTop->rchild;
+            } else {
+                stk.pop();
+                r = pTop;
+                if(pTop->data == p->data) {
+                    // 保存 p 的所有父节点
+                    while(!stk.empty()) {
+                        pRoot[pSize++] = stk.top();
+                        stk.pop();
+                    }
+                    for(int i = pSize-1; i >= 0; i++) {
+                        stk.push(pRoot[i]);
+                    }
+                }
+                if(pTop->data == q->data) {
+                    while(!stk.empty()) {
+                        qRoot[qSize++] = stk.top();
+                        stk.pop();
+                        for(int i = qSize-1; i >= 0; i--) {
+                            stk.push(qRoot[i]);
+                        }
+                    }
+                }
+                pTop = NULL;
+            }
+        }
+    }
+    // 进行匹配
+    for(int i = 0; i < pSize; i++) {
+        BiTreeNode* pPnode = pRoot[i];
+        for(int j = 0; j < qSize; j++) {
+            BiTreeNode *pQnode = qRoot[j];
+            if(pPnode == pQnode) {
+                return pPnode;
+            }
+        }
+    }       
 }
