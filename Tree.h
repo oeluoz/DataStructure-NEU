@@ -14,6 +14,15 @@ typedef struct BSTNode {
     BSTNode* rchild;
 }BSTNode, *BSTree;
 
+typedef struct BiThreadTreeNode {
+    ElemType data;
+    int ltag;
+    int rtag;
+    BiThreadTreeNode* lchild;
+    BiThreadTreeNode* rchild;
+}BiThreadTreeNode, *BiThreadTree;
+
+
 void treeDemo();
 
 void preTraverse(BiTree root);
@@ -50,4 +59,21 @@ void findAllLowerThanK(BSTree T, int k);
 void getBiggerThanValue(BSTree T, int value, int &preValue);
 
 void getBiggerThanValueGlobal(BSTree T, int value);
+
+
+BiThreadTree createTreePreAndInThread(ElemType preOrderList[], int preStartIndex, int preEndIndex,
+                        ElemType inOrderList[], int inStartIndex, int inEndIndex);
+
+void preOrderThreading(BiThreadTree T, BiThreadTreeNode *&pre);
+void createPreThreading(BiThreadTree T);
+void preOrderThreadTraversing(BiThreadTree T);
+void preTraverseThread(BiThreadTree T);
+
+void inTraverseThread(BiThreadTree T);
+void inOrderThreading(BiThreadTree T, BiThreadTreeNode *&pre);
+void createInThreading(BiThreadTree T);
+BiThreadTreeNode* getFirstNodeIn(BiThreadTree T);
+BiThreadTreeNode* getNext(BiThreadTreeNode* pCurrent);
+void inOrderThreadTraversing(BiThreadTree T);
+
 #endif // TREE_H_INCLUDED

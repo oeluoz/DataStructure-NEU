@@ -21,6 +21,9 @@ void treeDemo()
     ElemType inOrderList[] = {'D', 'B', 'E', 'A', 'F', 'C', 'G', 'H', 'I'};
     BiTree root = createTreePreAndIn(preOrderList, 0, 5,
                                      inOrderList, 0, 5);
+    BiThreadTree rootThread = createTreePreAndInThread(preOrderList, 0, 5,
+                                     inOrderList, 0, 5);
+    printf("cr");
     BiTree rootLevel = createTreeLevelAndIn(levelOrderList, 0, 6, inOrderList, 0, 6);
 
     BSTree bstRoot = NULL;
@@ -127,6 +130,16 @@ void treeDemo()
     //printf("\nbigger than value: reference: %d global: ", preValue);
     //getBiggerThanValueGlobal(bstRoot, 7);
     //printf("%d \n", pCloseValue->data);
+    printf("\n>==========Thread Tree==========>\n");
+    //preTraverseThread(rootThread);
+    //printf("\n");
+    //createPreThreading(rootThread);
+    //
+    //preOrderThreadTraversing(rootThread);
+    inTraverseThread(rootThread);
+    printf("\n");
+    createInThreading(rootThread);
+    inOrderThreadTraversing(rootThread);
 }
 
 void preTraverse(BiTree root)
@@ -175,6 +188,7 @@ BiTree createTreePreAndIn(ElemType preOrderList[], int preStartIndex, int preEnd
                        inOrderList, inStartIndex, rIndex - 1);
     root->rchild = createTreePreAndIn(preOrderList,preStartIndex+leftLength+1, preEndIndex,
                                       inOrderList, rIndex+1, inEndIndex);
+    return root;
 }
 
 BiTree createTreeLevelAndIn(ElemType levelOrderList[], int levelStartIndex, int levelEndIndex,
@@ -646,3 +660,141 @@ void getBiggerThanValueGlobal(BSTree T, int value) {
 }
 
 // 平衡二叉树
+
+// 线索二叉树
+
+void preTraverseThread(BiThreadTree T) {
+    if(T) {
+        printf("%c ", T->data);
+        preTraverseThread(T->lchild);
+        preTraverseThread(T->rchild);
+    }
+}
+
+// 先序和中序创建二叉树
+BiThreadTree createTreePreAndInThread(ElemType preOrderList[], int preStartIndex, int preEndIndex,
+                        ElemType inOrderList[], int inStartIndex, int inEndIndex)
+{
+    if(preStartIndex > preEndIndex) {
+        return NULL;
+    }
+    BiThreadTreeNode* root = (BiThreadTreeNode*)malloc(sizeof(BiThreadTreeNode));
+    root->data = preOrderList[preStartIndex]; // 先序序列第一个位置
+
+    int rIndex;
+    for(rIndex = inStartIndex; rIndex <= inEndIndex; rIndex++) {
+        if(inOrderList[rIndex] == root->data) break;
+    }
+
+    // 创建左子树
+    int leftLength = rIndex - inStartIndex; // 计算左子树长度，pre按照 root left right 顺序排列，因此计算出长度直接可以进行划分
+    root->lchild = createTreePreAndInThread(preOrderList, preStartIndex + 1, preStartIndex + leftLength,
+                       inOrderList, inStartIndex, rIndex - 1);
+    root->rchild = createTreePreAndInThread(preOrderList,preStartIndex+leftLength+1, preEndIndex,
+                                      inOrderList, rIndex+1, inEndIndex);
+    if(root->lchild) root->ltag = 0;
+    if(root->rchild) root->rtag = 0;
+    return root;
+}
+
+// 先序线索化
+void preOrderThreading(BiThreadTree T, BiThreadTreeNode *&pre) {
+    if(T) {
+        if(!T->lchild) {
+            T->ltag = 1;
+            T->lchild = pre;
+        }
+        if(pre && !pre->rchild) {
+            pre->rtag = 1;
+            pre->rchild = T;
+        }
+        pre = T;
+        if(!T->ltag) {
+            preOrderThreading(T->lchild, pre);
+        }
+        if(!T->rtag) {
+            preOrderThreading(T->rchild, pre);
+        }
+    }
+}
+void createPreThreading(BiThreadTree T) {
+    BiThreadTreeNode *pre = NULL;
+    preOrderThreading(T, pre);
+}
+
+// 先序遍历 根(前驱) - 左孩子(左子树根)(后继) -
+// 1 左子树不存在，后继就是右孩子(右子树根)，
+// 2 右孩子不存在，那么右孩子一定是线索，通过线索获得后继
+// 1 and 2 如果左子树不存在，后继一定是右孩子指针域指向的节点
+
+void preOrderThreadTraversing(BiThreadTree T) {
+    // 后继节点作为前驱节点
+    BiThreadTreeNode* pre = T; // 先序遍历的时候第一个节点一定是前驱节点
+    BiThreadTreeNode* pSuccessor = NULL;
+    while(pre) {
+        printf("%c ", pre->data);
+        if(pre->ltag == 0) { // 左子树存在
+            pSuccessor = pre->lchild;
+        } else {
+            pSuccessor = pre->rchild;
+        }
+        pre = pSuccessor; // 后继更新为前驱，再一次前序找后继，重复
+    }
+}
+
+
+void inTraverseThread(BiThreadTree T) {
+    if(T) {
+        inTraverseThread(T->lchild);
+        printf("%c ", T->data);
+        inTraverseThread(T->rchild);
+    }
+}
+
+// 中序线索二叉树
+void inOrderThreading(BiThreadTree T, BiThreadTreeNode *&pre) {
+    if(T) {
+        inOrderThreading(T->lchild, pre);
+        if(!T->lchild) {
+            T->ltag = 1;
+            T->lchild = pre;
+        }
+        if(pre && !pre->rchild) {
+            pre->rtag = 1;
+            pre->rchild = T;
+        }
+        pre = T;
+        inOrderThreading(T->rchild, pre);
+    }
+}
+void createInThreading(BiThreadTree T) {
+    BiThreadTreeNode *pre = NULL;
+    inOrderThreading(T, pre);
+
+    // 最后一个节点需要线索化
+    pre->rchild = NULL;
+    pre->rtag = 1;
+}
+BiThreadTreeNode* getFirstNodeIn(BiThreadTree T) {
+    BiThreadTreeNode *pT = T;
+    while(pT->ltag == 0) { // 处理最后一个节点没有线索化造成的越界问题
+        pT = pT->lchild;
+    }
+    return pT;
+}
+BiThreadTreeNode* getNext(BiThreadTreeNode* pCurrent) {
+    if(pCurrent->rtag == 1) {
+        return pCurrent->rchild;
+    } else {
+        return getFirstNodeIn(pCurrent->rchild);
+    }
+}
+// 中序线索二叉树的遍历
+void inOrderThreadTraversing(BiThreadTree T) {
+    BiThreadTreeNode* firstNode = getFirstNodeIn(T);
+    BiThreadTreeNode* pre = firstNode;
+    while(pre) {
+        printf("%c ", pre->data);
+        pre = getNext(pre);
+    }
+}
